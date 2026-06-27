@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    environment {
+        SONAR_TOKEN = credentials('sonar-token')
+    }
+
+    stages {
+        stage('Vérification') {
+            steps {
+                echo 'Pipeline Jenkins démarré !'
+            }
+        }
+
+        stage('Analyse SonarQube') {
+            steps {
+                sh '''
+                    sonar-scanner \
+                    -Dsonar.projectKey=ansible-jenkins \
+                    -Dsonar.sources=/ansible \
+                    -Dsonar.host.url=http://sonarqube:9000 \
+                    -Dsonar.token=$SONAR_TOKEN
+                '''
+            }
+        }
+
+        stage('Déploiement Ansible') {
+            steps {
+                sh '''
+                    ANSIBLE_CONFIG=/ansible/ansible.cfg \
+                    ansible-playbook \
+                    -i /ansible/inventories/hosts.ini \
+                    /ansible/playbooks/deploy.yml
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Déploiement réussi !'
+        }
+        failure {
+            echo 'Echec du déploiement.'
+        }
+    }
+}

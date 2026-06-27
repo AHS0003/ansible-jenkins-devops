@@ -1,0 +1,48 @@
+services:
+  control:
+    image: ubuntu:22.04
+    container_name: ansible-control
+    tty: true
+    networks:
+      - devops-net
+
+  server1:
+    image: ubuntu:22.04
+    container_name: server1
+    tty: true
+    networks:
+      - devops-net
+
+  server2:
+    image: ubuntu:22.04
+    container_name: server2
+    tty: true
+    networks:
+      - devops-net
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    networks:
+      - devops-net
+
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    networks:
+      - devops-net
+
+networks:
+  devops-net:
+    driver: bridge
+
+volumes:
+  jenkins_home:
