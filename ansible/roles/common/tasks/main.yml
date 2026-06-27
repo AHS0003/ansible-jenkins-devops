@@ -1,0 +1,11 @@
+---
+- name: Mettre a jour les paquets
+  apt:
+    update_cache: yes
+
+- name: Installer curl et git
+  apt:
+    name:
+      - curl
+      - git
+    state: present
